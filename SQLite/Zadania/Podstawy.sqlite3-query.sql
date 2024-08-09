@@ -116,3 +116,171 @@ W poprzednim zapytaniu użyliśmy `UnitsInStock = 0 ASC` jako pierwszego kryteri
 **Nowe zapytanie jest bardziej zoptymalizowane i powinno działać szybciej, zwłaszcza dla dużych tabel.**
 
 */
+/*
+Zadanie 6:
+Wybierz ContactName, Fax z tabeli Customer i posortuj wyniki malejąco. 
+Dla kolumny Fax posortuj wyniki rosnąco. Wartość NULL musi być umieszczona na koncu.
+Ogranicz wyniki do 10 wierszy.
+*/
+SELECT
+    ContactName,
+    Fax
+FROM
+    Customer
+ORDER BY
+    Fax ASC NULLS LAST
+LIMIT
+    10;
+
+/*
+Zadanie 7:
+Wybierz ContactName, Fax z tabeli Customer i posortuj wyniki malejąco. 
+Dla kolumny Fax posortuj wyniki rosnąco. Wartość NULL musi być umieszczona na koncu.
+Ogranicz wyniki do 5 wierszy od 10 do 14.
+*/
+SELECT
+    ContactName,
+    Fax
+FROM
+    Customer
+ORDER BY
+    Fax ASC NULLS LAST
+LIMIT
+    5
+OFFSET
+    10;
+
+/*
+Limit i offset pozwalają na stronicowanie wyników zapytania.
+
+* **Limit:** Określa maksymalną liczbę wierszy, które mają być zwrócone.
+* **Offset:** Określa liczbę wierszy, które mają zostać pominiętych przed zwróceniem wyników.
+
+*/
+/*
+Zadanie 8:
+Wybierz unikalne wartości kolumny ContactTitle z tabeli Customer
+*/
+SELECT DISTINCT
+    ContactTitle
+FROM
+    Customer;
+
+-- WHERE --
+SELECT
+    ContactName,
+    City,
+    Country
+FROM
+    Customer
+WHERE
+    (
+        Country == 'Germany'
+        AND City == 'Brandenburg'
+    )
+    OR Country == 'Poland';
+
+SELECT DISTINCT
+    ContactTitle
+FROM
+    Customer;
+
+-- IN --
+SELECT
+    ContactName,
+    City,
+    Country
+FROM
+    Customer
+WHERE
+    Country IN ('Poland', 'UK', 'Canada')
+ORDER BY
+    Country;
+
+-- LIKE nie wrażliwy na wielkość liter
+-- Kilka znaków `%` jeden znak `_`
+SELECT
+    ContactName,
+    City,
+    Country
+FROM
+    Customer
+WHERE
+    Country LIKE('U%')
+ORDER BY
+    Country;
+
+-- GLOB -- Wrażliwy na wielkość liter
+-- kilka znaków `*` jeden znak `?``
+SELECT
+    ContactName,
+    City,
+    Country
+FROM
+    Customer
+WHERE
+    Country GLOB('u*')
+ORDER BY
+    Country;
+
+-- COUNT --
+SELECT
+    COUNT(*) as ProductCount
+FROM
+    Product;
+
+SELECT
+    Count(DISTINCT SupplierId) as numberSupplier -- tylko unikalne wartosci
+    --COUNT(SupplierId) 
+FROM
+    Product;
+
+-- SUM --
+SELECT
+    SUM(UnitPrice) AS TotalSum
+FROM
+    Product;
+
+-- AVG --
+SELECT
+    AVG(UnitPrice) AS TotalAvarage
+FROM
+    Product;
+
+-- MIN --
+SELECT
+    min(UnitPrice) AS MinProd
+FROM
+    Product;
+
+-- MAX --
+SELECT
+    MAX(UnitPrice) AS MAXProd
+FROM
+    Product;
+
+-- GROUP BY
+SELECT
+    EmployeeId,
+    SUM(Freight) as SumFreight,
+    AVG(Freight) as AVGFreight,
+    COUNT(*) as COUNTFreight
+FROM
+    'Order'
+GROUP BY
+    EmployeeId;
+
+-- HAVING
+SELECT
+    EmployeeId,
+    SUM(Freight) as SumFreight,
+    AVG(Freight) as AVGFreight,
+    COUNT(*) as COUNTFreight
+FROM
+    'Order'
+WHERE
+    EmployeeId != 9
+GROUP BY
+    EmployeeId
+HAVING
+    SumFreight > 9000;

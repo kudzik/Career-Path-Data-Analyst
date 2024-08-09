@@ -1,0 +1,99 @@
+-- database: /Users/kudzik/Repo/Career-Path-Data-Analyst/SQLite/DB/northwind.db
+-- Use the ▷ button in the top right corner to run the entire file.
+-- Komentarz jednoliniowy
+/* Komentarz 
+wielowierszowy */
+SELECT
+    *
+FROM
+    Category;
+
+-- Wyswietl wszystkie tabele
+SELECT
+    name
+FROM
+    sqlite_master
+WHERE
+    type = 'table';
+
+-- Sprawdź czy tabela istnieje
+SELECT
+    name
+FROM
+    sqlite_master
+WHERE
+    type = 'table'
+    AND name = 'Employee';
+
+-- Wersja SQLite
+SELECT
+    sqlite_version();
+
+SELECT
+    20;
+
+SELECT
+    20 + 40;
+
+SELECT
+    20 -10;
+
+-- Dzielenie całkowite
+SELECT
+    21 / 5;
+
+-- Dzielenie z resztą
+SELECT
+    21 / 5.0;
+
+SELECT
+    21 % 5;
+
+SELECT
+    'python',
+    'java',
+    'C#';
+
+-- Łączenie tekstu
+SELECT
+    'Python' || ' version: ' || '3.14';
+
+SELECT
+    true,
+    FALSE;
+
+SELECT
+    NULL;
+
+-- Nazwa kolumny
+SELECT
+    24.43 / 3.0 as wymik;
+
+SELECT
+    *
+FROM
+    Category;
+
+SELECT
+    CategoryName as Category,
+    Description
+From
+    Category;
+
+SELECT
+    FirstName,
+    LastName,
+    City,
+    PostalCode
+FROM
+    Employee;
+
+-- ORDER BY -- SORTOWANIE
+SELECT
+    Title,
+    FirstName
+FROM
+    Employee
+ORDER BY
+    Title,
+    LastName;

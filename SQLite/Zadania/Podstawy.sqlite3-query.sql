@@ -284,3 +284,74 @@ GROUP BY
     EmployeeId
 HAVING
     SumFreight > 9000;
+
+-- CASE WHEN
+SELECT DISTINCT
+    ContactTitle,
+    CASE
+        WHEN ContactTitle == 'Owner' THEN 'Owner'
+        ELSE 'Other'
+    END as Title
+FROM
+    Customer;
+
+SELECT
+    ProductName,
+    UnitPrice,
+    CASE
+        WHEN UnitPrice < 10.0 THEN 'LOW'
+        WHEN UnitPrice >= 10.0
+        AND UnitPrice < 30.0 THEN 'MEDIUM'
+        ELSE 'HIGH'
+    END AS PriceLevel
+FROM
+    Product;
+
+SELECT DISTINCT
+    ShipRegion,
+    CASE
+        WHEN ShipRegion IN (
+            'Western Europe',
+            'Northern Europe',
+            'Scandinavia',
+            'Southern Europe',
+            'British Isles',
+            'Eastern Europe'
+        ) THEN 'Europa'
+        WHEN ShipRegion IN (
+            'South America',
+            'Central America',
+            'North America'
+        ) THEN 'Ameryka'
+    END AS kontynent
+FROM
+    `Order`;
+
+-- PODZAPYTANIA --
+SELECT
+    *
+FROM
+    OrderDetail
+WHERE
+    ProductId IN (
+        SELECT
+            Id
+        FROM
+            Product
+        WHERE
+            UnitsInStock > 0
+    );
+
+SELECT
+    *
+FROM
+    `Order`
+WHERE
+    CustomerId IN (
+        SELECT DISTINCT
+            Id
+        FROM
+            Customer
+        WHERE
+            Country LIKE('U%')
+    );

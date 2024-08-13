@@ -670,3 +670,191 @@ HAVING liczba_produktow > 1;
 ### Podsumowanie
 
 Grupowanie danych w SQLite jest potężnym narzędziem do analizy i agregacji informacji. Pozwala na tworzenie podsumowań, raportów i znajdowanie wzorców w danych. Umiejętne korzystanie z GROUP BY, funkcji agregujących i klauzuli HAVING może znacznie zwiększyć możliwości analizy danych w bazie.
+
+## `CASE WHEN` w SQL
+
+Instrukcja `CASE WHEN` w SQL jest potężnym narzędziem pozwalającym na warunkowe manipulowanie danymi w zapytaniach. Działa podobnie do instrukcji `if-else` znanej z innych języków programowania. Pozwala ona na wykonywanie różnych akcji w zależności od spełnienia określonych warunków.
+
+### Składnia `CASE WHEN`
+
+```sql
+SELECT kolumny,
+       CASE
+           WHEN warunek1 THEN wartość1
+           WHEN warunek2 THEN wartość2
+           ...
+           ELSE wartość_n
+       END AS alias
+FROM tabela;
+```
+
+- **`CASE`**: Rozpoczyna blok warunkowy.
+- **`WHEN`**: Definiuje warunek do sprawdzenia.
+- **`THEN`**: Określa, jaka wartość zostanie zwrócona, jeśli warunek jest spełniony.
+- **`ELSE`**: (Opcjonalnie) Określa wartość domyślną, jeśli żaden warunek nie jest spełniony.
+- **`END`**: Kończy blok `CASE`.
+
+### Przykłady użycia
+
+#### Przykład 1: Klasyfikacja na podstawie wartości
+
+Załóżmy, że masz tabelę `Product` i chcesz skategoryzować produkty na podstawie ich ceny (`UnitPrice`).
+
+```sql
+SELECT ProductName, UnitPrice,
+       CASE
+           WHEN UnitPrice > 50 THEN 'Drogi'
+           WHEN UnitPrice BETWEEN 20 AND 50 THEN 'Średni'
+           ELSE 'Tani'
+       END AS CenaKategoria
+FROM Product;
+```
+
+**Opis:**
+
+- Produkty z ceną powyżej 50 jednostek są oznaczane jako „Drogi”.
+- Produkty z ceną między 20 a 50 jednostek jako „Średni”.
+- W przeciwnym razie jako „Tani”.
+
+#### Przykład 2: Wyświetlanie informacji o stanach magazynowych
+
+Możesz również użyć `CASE WHEN`, aby pokazać informację o stanie magazynowym w tabeli `Product`, w zależności od liczby dostępnych jednostek (`UnitsInStock`).
+
+```sql
+SELECT ProductName, UnitsInStock,
+       CASE
+           WHEN UnitsInStock > 100 THEN 'Duży zapas'
+           WHEN UnitsInStock BETWEEN 50 AND 100 THEN 'Średni zapas'
+           WHEN UnitsInStock > 0 THEN 'Niski zapas'
+           ELSE 'Brak zapasów'
+       END AS StanMagazynowy
+FROM Product;
+```
+
+**Opis:**
+
+- Produkty z ponad 100 jednostkami w magazynie są oznaczane jako „Duży zapas”.
+- Produkty z liczbą jednostek od 50 do 100 są oznaczane jako „Średni zapas”.
+- Produkty z liczbą jednostek od 1 do 49 są oznaczane jako „Niski zapas”.
+- Produkty, które mają 0 jednostek na stanie, są oznaczane jako „Brak zapasów”.
+
+### Przykład 3: Użycie `CASE` w klauzuli `ORDER BY`
+
+Możesz także użyć `CASE WHEN` w klauzuli `ORDER BY`, aby zmienić sposób sortowania danych na podstawie warunków.
+
+```sql
+SELECT ProductName, UnitsInStock
+FROM Product
+ORDER BY 
+    CASE 
+        WHEN UnitsInStock = 0 THEN 1 
+        ELSE 0 
+    END ASC, 
+    UnitsInStock DESC;
+```
+
+**Opis:**
+
+- Produkty, które mają `0` jednostek w magazynie, są sortowane na końcu, a pozostałe produkty są sortowane według liczby jednostek w magazynie malejąco.
+
+### Podsumowanie
+
+Instrukcja `CASE WHEN` to bardzo elastyczne narzędzie w SQL, które pozwala na tworzenie złożonych zapytań dostosowanych do różnych scenariuszy. Możesz ją używać w selekcji danych, do generowania kolumn, a także do kontrolowania kolejności sortowania.
+
+## Podzapytania w SQL
+
+Podzapytanie, zwane także zapytaniem zagnieżdżonym (ang. _subquery_), to zapytanie, które znajduje się wewnątrz innego zapytania SQL. Wynik podzapytania jest używany przez zapytanie zewnętrzne (główne), aby dostarczyć dane do dalszego przetwarzania.
+
+### Rodzaje podzapytań
+
+Podzapytania można stosować w różnych miejscach w zapytaniu SQL, takich jak:
+
+1. **Podzapytania w klauzuli `WHERE`** – używane do filtrowania wyników.
+2. **Podzapytania w klauzuli `FROM`** – traktowane jako tymczasowa tabela.
+3. **Podzapytania w klauzuli `SELECT`** – używane do obliczeń lub transformacji danych w kolumnach.
+
+### Przykłady podzapytań
+
+#### 1. Podzapytanie w klauzuli `WHERE`
+
+Załóżmy, że chcemy znaleźć wszystkie produkty, które mają cenę wyższą niż średnia cena wszystkich produktów.
+
+```sql
+SELECT ProductName, UnitPrice
+FROM Product
+WHERE UnitPrice > (SELECT AVG(UnitPrice) FROM Product);
+```
+
+**Opis:**
+
+- Podzapytanie `(SELECT AVG(UnitPrice) FROM Product)` oblicza średnią cenę wszystkich produktów.
+- Główne zapytanie zwraca tylko te produkty, których cena jest wyższa od średniej.
+
+#### 2. Podzapytanie w klauzuli `FROM`
+
+Podzapytania w klauzuli `FROM` mogą być traktowane jak tymczasowe tabele. Na przykład, możemy znaleźć średnią cenę dla każdej kategorii produktów:
+
+```sql
+SELECT CategoryID, AVG(UnitPrice) AS AvgPrice
+FROM Product
+GROUP BY CategoryID;
+```
+
+Następnie możemy użyć tego wyniku jako tymczasowej tabeli do dalszych analiz:
+
+```sql
+SELECT CategoryID, AvgPrice
+FROM (SELECT CategoryID, AVG(UnitPrice) AS AvgPrice
+      FROM Product
+      GROUP BY CategoryID) AS AvgCategoryPrices
+WHERE AvgPrice > 20;
+```
+
+**Opis:**
+
+- Wewnętrzne zapytanie (podzapytanie) oblicza średnią cenę dla każdej kategorii produktów.
+- Zewnętrzne zapytanie filtruje te wyniki, wybierając tylko kategorie z średnią ceną powyżej 20 jednostek.
+
+#### 3. Podzapytanie w klauzuli `SELECT`
+
+Podzapytania w klauzuli `SELECT` są używane do obliczeń w kolumnach. Na przykład, możemy wyświetlić nazwę produktu oraz liczbę zamówień dla każdego produktu:
+
+```sql
+SELECT ProductName,
+       (SELECT COUNT(*) 
+        FROM OrderDetail 
+        WHERE Product.ProductID = OrderDetail.ProductID) AS OrdersCount
+FROM Product;
+```
+
+**Opis:**
+
+- Podzapytanie `(SELECT COUNT(*) FROM OrderDetail WHERE Product.ProductID = OrderDetail.ProductID)` liczy liczbę zamówień dla danego produktu.
+- Wynik podzapytania jest wyświetlany jako nowa kolumna `OrdersCount` w wynikach zapytania głównego.
+
+### Zasady i dobre praktyki
+
+- **Złożoność:** Podzapytania mogą znacząco zwiększyć złożoność zapytania, dlatego warto je stosować z umiarem.
+- **Wydajność:** Czasami używanie podzapytań może prowadzić do spadku wydajności, szczególnie w przypadku dużych zbiorów danych. W takich sytuacjach warto rozważyć inne podejścia, jak np. łączenie tabel (_JOIN_).
+- **Czytelność:** Długie zapytania z wieloma podzapytań mogą być trudne do zrozumienia i utrzymania. W takich przypadkach warto rozważyć ich podział na mniejsze, łatwiejsze do zrozumienia części.
+
+### Przykładowe zadanie
+
+**Zadanie:** Wyświetl nazwę i cenę każdego produktu, który ma wyższą cenę niż średnia cena produktów w tej samej kategorii.
+
+```sql
+SELECT ProductName, UnitPrice
+FROM Product AS p
+WHERE UnitPrice > (SELECT AVG(UnitPrice)
+                   FROM Product
+                   WHERE CategoryID = p.CategoryID);
+```
+
+**Opis:**
+
+- Podzapytanie oblicza średnią cenę dla produktów w tej samej kategorii (`CategoryID`).
+- Główne zapytanie zwraca tylko te produkty, które mają wyższą cenę niż średnia w ich kategorii.
+
+### Podsumowanie
+
+Podzapytania są bardzo przydatnym narzędziem w SQL, pozwalającym na wykonywanie złożonych operacji w ramach jednego zapytania. Pozwalają na dynamiczne filtrowanie, grupowanie i transformację danych, co czyni je nieocenionym narzędziem w analizie danych.

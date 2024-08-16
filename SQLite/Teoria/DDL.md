@@ -1,12 +1,26 @@
 # Główne Komendy DDL (Data Definition Language) w SQL
 
-**DDL** (ang. *Data Definition Language*) to część języka SQL, która służy do definiowania i zarządzania strukturą bazy danych. DDL obejmuje komendy, które umożliwiają tworzenie, modyfikowanie i usuwanie obiektów w bazie danych, takich jak tabele, indeksy, widoki itp.
+**DDL** (ang. *Data Definition Language*) to część języka SQL, która służy do definiowania i zarządzania strukturą bazy danych. DDL obejmuje komendy umożliwiające tworzenie, modyfikowanie i usuwanie obiektów w bazie danych, takich jak tabele, indeksy czy widoki.
 
-## 1. **CREATE**
+## 1. CREATE
 
-Komenda `CREATE` służy do tworzenia nowych obiektów w bazie danych, takich jak tabele, widoki, indeksy itp.
+Komenda `CREATE` służy do tworzenia nowych obiektów w bazie danych, takich jak tabele, bazy danych, widoki czy indeksy. Używając tej komendy, definiujemy strukturę danych, z którą będziemy pracować.
 
-**Przykład:** Tworzenie nowej tabeli `Customers`.
+### Tworzenie Tabeli (CREATE TABLE)
+
+Tabele są podstawowym obiektem w bazach danych, przechowującym dane w formie wierszy i kolumn.
+
+#### Składnia
+
+```sql
+CREATE TABLE nazwa_tabeli (
+    nazwa_kolumny1 typ_danych [opcje],
+    nazwa_kolumny2 typ_danych [opcje],
+    ...
+);
+```
+
+#### Przykład
 
 ```sql
 CREATE TABLE Customers (
@@ -17,101 +31,297 @@ CREATE TABLE Customers (
 );
 ```
 
-**Opis:**
+### Tworzenie tabeli tymczasowej
 
-- `CREATE TABLE` tworzy nową tabelę o nazwie `Customers`.
-- `CustomerID` jest kluczem głównym (`PRIMARY KEY`), co oznacza, że wartości w tej kolumnie muszą być unikalne.
-- `CustomerName` ma ustawioną klauzulę `NOT NULL`, co oznacza, że nie może przyjmować wartości `NULL`.
+Aby utworzyć tabelę tymczasową, używasz polecenia `CREATE TEMPORARY TABLE`. Oto podstawowa składnia:
 
-## 2. **ALTER**
+```sql
+CREATE TEMPORARY TABLE nazwa_tabeli (
+    kolumna1 typ_danych,
+    kolumna2 typ_danych,
+    ...
+);
+```
 
-Komenda `ALTER` służy do modyfikowania istniejących obiektów w bazie danych, takich jak dodawanie nowych kolumn, zmiana typu danych, usuwanie kolumn itp.
+### Przykład
 
-**Przykład:** Dodawanie nowej kolumny `Email` do tabeli `Customers`.
+Załóżmy, że chcesz utworzyć tymczasową tabelę do przechowywania wyników zapytania o studentów:
+
+```sql
+CREATE TEMPORARY TABLE temp_students (
+    student_id INTEGER PRIMARY KEY,
+    first_name TEXT NOT NULL,
+    last_name TEXT NOT NULL,
+    grade INTEGER
+);
+```
+
+### Wykorzystanie tabeli tymczasowej
+
+Tabele tymczasowe są dostępne tylko w ramach sesji, w której zostały utworzone. Oznacza to, że po zakończeniu sesji (np. zamknięciu połączenia z bazą danych), tabela tymczasowa zostanie automatycznie usunięta.
+
+Możesz wstawiać dane do tabeli tymczasowej tak samo, jak do zwykłej tabeli:
+
+```sql
+INSERT INTO temp_students (student_id, first_name, last_name, grade)
+VALUES (1, 'Jan', 'Kowalski', 5);
+```
+
+### Zalety tabel tymczasowych
+
+- **Szybkość**: Operacje na tabelach tymczasowych są zazwyczaj szybsze, ponieważ są one przechowywane w pamięci.
+- **Izolacja**: Dane w tabelach tymczasowych są izolowane od innych sesji, co zapewnia bezpieczeństwo i integralność danych.
+
+### Tworzenie Bazy Danych (CREATE DATABASE)
+
+Komenda `CREATE DATABASE` tworzy nową bazę danych.
+
+#### Przykład
+
+```sql
+CREATE DATABASE MyDatabase;
+```
+
+### Tworzenie Widoków (CREATE VIEW)
+
+Widoki to zapisane zapytania, które mogą być traktowane jak wirtualne tabele.
+
+#### Przykład
+
+```sql
+CREATE VIEW CustomerView AS
+SELECT CustomerName, Country FROM Customers;
+```
+
+### Tworzenie Indeksów (CREATE INDEX)
+
+Indeksy poprawiają wydajność zapytań poprzez szybkie odnajdywanie danych w tabelach.
+
+#### Przykład
+
+```sql
+CREATE INDEX idx_country ON Customers(Country);
+```
+
+### Tworzenie Tabeli z Relacjami
+
+Możemy tworzyć tabele z relacjami, używając kluczy obcych (FOREIGN KEY).
+
+#### Przykład
+
+```sql
+CREATE TABLE Orders (
+    OrderID INTEGER PRIMARY KEY,
+    OrderDate DATE,
+    CustomerID INTEGER,
+    FOREIGN KEY (CustomerID) REFERENCES Customers(CustomerID)
+);
+```
+
+## Tworzenie tabeli będącej wynikiem zapytania
+
+Aby utworzyć tabelę będącą wynikiem zapytania w SQLite, możesz użyć polecenia `CREATE TABLE AS`. To polecenie pozwala na utworzenie nowej tabeli i jednoczesne wypełnienie jej danymi zwróconymi przez zapytanie SELECT. Oto jak to zrobić:
+
+### Składnia
+
+```sql
+CREATE TABLE nowa_tabela AS
+SELECT kolumna1, kolumna2, ...
+FROM istniejąca_tabela
+WHERE warunek;
+```
+
+### Przykład
+
+Załóżmy, że masz tabelę `students` i chcesz utworzyć nową tabelę `top_students`, która będzie zawierała tylko tych studentów, którzy mają ocenę powyżej 90:
+
+```sql
+CREATE TABLE top_students AS
+SELECT student_id, first_name, last_name, grade
+FROM students
+WHERE grade > 90;
+```
+
+### Kroki
+
+1. **Tworzenie nowej tabeli**: Nowa tabela `top_students` zostanie utworzona z kolumnami `student_id`, `first_name`, `last_name` i `grade`.
+2. **Wypełnienie danymi**: Tabela zostanie wypełniona danymi zwróconymi przez zapytanie SELECT, czyli tylko tymi studentami, którzy mają ocenę powyżej 90.
+
+### Zalety
+
+- **Prostota**: Możesz szybko utworzyć nową tabelę na podstawie wyników zapytania bez potrzeby ręcznego wstawiania danych.
+- **Wydajność**: Operacja jest zazwyczaj szybka, ponieważ SQLite wykonuje zapytanie SELECT i tworzy tabelę w jednym kroku.
+
+## 2. ALTER
+
+Komenda `ALTER` służy do modyfikowania struktury istniejących obiektów w bazie danych.
+
+### 1. Dodawanie nowej kolumny
+
+#### Składnia
+
+```sql
+ALTER TABLE nazwa_tabeli
+ADD COLUMN nazwa_kolumny typ_danych [opcje];
+```
+
+#### Przykład
 
 ```sql
 ALTER TABLE Customers
 ADD COLUMN Email TEXT;
 ```
 
-**Opis:**
+### 2. Usuwanie kolumny
 
-- `ALTER TABLE` zmienia istniejącą tabelę `Customers`.
-- `ADD COLUMN` dodaje nową kolumnę `Email` typu `TEXT`.
+**Uwaga:** SQLite nie obsługuje bezpośrednio usuwania kolumny.
 
-## 3. **DROP**
-
-Komenda `DROP` służy do usuwania obiektów z bazy danych, takich jak tabele, widoki, indeksy itp. Jest to operacja destrukcyjna, co oznacza, że usunięte dane nie mogą być odzyskane.
-
-**Przykład:** Usuwanie tabeli `Customers`.
+#### Przykład (w innych systemach baz danych)
 
 ```sql
-DROP TABLE Customers;
+ALTER TABLE Customers
+DROP COLUMN ContactName;
 ```
 
-**Opis:**
+### 3. Zmiana typu danych kolumny
 
-- `DROP TABLE` usuwa tabelę `Customers` wraz z całą jej zawartością.
+**Uwaga:** SQLite nie obsługuje bezpośrednio tej funkcji.
 
-## 4. **TRUNCATE**
-
-Komenda `TRUNCATE` służy do szybkiego usuwania wszystkich wierszy z tabeli, ale pozostawia strukturę tabeli nienaruszoną. W odróżnieniu od `DROP`, `TRUNCATE` nie usuwa tabeli, a jedynie opróżnia jej zawartość.
-
-**Przykład:** Opróżnianie tabeli `Customers`.
+#### Przykład (w innych systemach baz danych)
 
 ```sql
-TRUNCATE TABLE Customers;
+ALTER TABLE Customers
+ALTER COLUMN CustomerName TEXT;
 ```
 
-**Opis:**
+### 4. Zmiana nazwy kolumny
 
-- `TRUNCATE TABLE` usuwa wszystkie dane z tabeli `Customers`, ale tabela sama w sobie pozostaje w bazie danych.
+#### Składnia
 
-## 5. **RENAME**
+```sql
+ALTER TABLE nazwa_tabeli
+RENAME COLUMN stara_nazwa_kolumny TO nowa_nazwa_kolumny;
+```
 
-Komenda `RENAME` służy do zmiany nazwy istniejącego obiektu, takiego jak tabela.
+#### Przykład
 
-**Przykład:** Zmiana nazwy tabeli `Customers` na `Clients`.
+```sql
+ALTER TABLE Customers
+RENAME COLUMN ContactName TO ContactPerson;
+```
+
+### 5. Zmiana nazwy tabeli
+
+#### Składnia
+
+```sql
+ALTER TABLE stara_nazwa_tabeli
+RENAME TO nowa_nazwa_tabeli;
+```
+
+#### Przykład
 
 ```sql
 ALTER TABLE Customers
 RENAME TO Clients;
 ```
 
-**Opis:**
+## 3. DROP
 
-- `ALTER TABLE ... RENAME TO` zmienia nazwę tabeli `Customers` na `Clients`.
+Komenda `DROP` służy do usuwania całych obiektów z bazy danych. Jest to potężna i potencjalnie niebezpieczna komenda, ponieważ usuwa wszystkie dane zawarte w obiekcie oraz jego strukturę.
 
-## Zasady i dobre praktyki
+### 1. Usuwanie tabeli (DROP TABLE)
 
-- **Tworzenie z planem:** Przed użyciem komend DDL warto dobrze zaplanować strukturę bazy danych, aby uniknąć późniejszych modyfikacji, które mogą być skomplikowane.
-- **Ostrożność przy usuwaniu:** Komendy `DROP` i `TRUNCATE` są operacjami nieodwracalnymi. Należy upewnić się, że naprawdę chcemy usunąć dane lub obiekty, zanim wykonamy te komendy.
-- **Bezpieczeństwo:** Zawsze tworzenie kopii zapasowych bazy danych przed wykonywaniem destrukcyjnych operacji jest dobrą praktyką.
-
-## Przykład złożony
-
-Załóżmy, że chcemy stworzyć nową tabelę `Orders`, a następnie dodać do niej kolumnę `OrderDate`, zmienić nazwę tabeli na `Purchases` i na końcu ją usunąć.
+#### Składnia
 
 ```sql
--- Tworzenie tabeli Orders
-CREATE TABLE Orders (
-    OrderID INTEGER PRIMARY KEY,
-    CustomerID INTEGER,
-    Amount REAL
-);
-
--- Dodanie kolumny OrderDate
-ALTER TABLE Orders
-ADD COLUMN OrderDate DATE;
-
--- Zmiana nazwy tabeli na Purchases
-ALTER TABLE Orders
-RENAME TO Purchases;
-
--- Usunięcie tabeli Purchases
-DROP TABLE Purchases;
+DROP TABLE nazwa_tabeli;
 ```
 
-### Podsumowanie
+#### Przykład
 
-Komendy DDL są kluczowe dla zarządzania strukturą bazy danych. Pozwalają na tworzenie nowych tabel, modyfikowanie ich struktury, a także usuwanie tabel i innych obiektów, gdy są już niepotrzebne. Znajomość tych komend jest niezbędna do efektywnego projektowania i zarządzania bazami danych.
+```sql
+DROP TABLE Orders;
+```
+
+### 2. Usuwanie bazy danych (DROP DATABASE)
+
+#### Przykład
+
+```sql
+DROP DATABASE MyDatabase;
+```
+
+**Uwaga:** W SQLite nie ma bezpośredniej komendy `DROP DATABASE`. Usunięcie bazy danych polega na usunięciu pliku z systemu plików.
+
+### 3. Usuwanie widoku (DROP VIEW)
+
+#### Składnia
+
+```sql
+DROP VIEW nazwa_widoku;
+```
+
+#### Przykład
+
+```sql
+DROP VIEW CustomerView;
+```
+
+### 4. Usuwanie indeksu (DROP INDEX)
+
+#### Składnia
+
+```sql
+DROP INDEX nazwa_indeksu;
+```
+
+#### Przykład
+
+```sql
+DROP INDEX idx_country;
+```
+
+## 4. TRUNCATE
+
+Komenda `TRUNCATE` służy do szybkiego usuwania wszystkich danych z tabeli, zachowując jej strukturę.
+
+#### Składnia
+
+```sql
+TRUNCATE TABLE nazwa_tabeli;
+```
+
+#### Przykład
+
+```sql
+TRUNCATE TABLE Orders;
+```
+
+**Uwaga:** SQLite nie obsługuje bezpośrednio komendy `TRUNCATE`. Zamiast tego należy użyć:
+
+```sql
+DELETE FROM nazwa_tabeli;
+```
+
+## 5. RENAME
+
+Komenda `RENAME` służy do zmiany nazw obiektów w bazie danych.
+
+#### Składnia
+
+```sql
+ALTER TABLE stara_nazwa_tabeli
+RENAME TO nowa_nazwa_tabeli;
+```
+
+#### Przykład
+
+```sql
+ALTER TABLE Customers
+RENAME TO Clients;
+```
+
+## Podsumowanie
+
+Komendy DDL są kluczowe dla zarządzania strukturą bazy danych. Pozwalają na tworzenie nowych obiektów, modyfikowanie ich struktury oraz usuwanie, gdy są już niepotrzebne. Znajomość tych komend jest niezbędna do efektywnego projektowania i zarządzania bazami danych.

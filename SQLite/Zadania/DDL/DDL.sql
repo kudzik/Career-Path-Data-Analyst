@@ -50,7 +50,7 @@ VALUES
 -- Tworzenie bazy tymczasowej
 CREATE TEMPORARY TABLE IF NOT EXISTS
     temp_table_name (
-        ID INTEGER NOT NULL PRIMARY KEY,
+        ID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL
     );
 
@@ -62,4 +62,39 @@ SELECT
 FROM
     'user'
 where
-    first_name == 'John'
+    first_name == 'John';
+
+-- TYPY Danych
+SELECT
+    typeof(20),
+    typeof(3.5),
+    typeof('SQL'),
+    typeof(false),
+    typeof(NULL),
+    typeof(x'0101');
+
+-- ROWID
+SELECT
+    *
+FROM
+    user
+where
+    rowid == 2;
+
+DELETE FROM user
+where
+    rowid == 2;
+
+EXPLAIN QUERY PLAN
+SELECT
+    *
+FROM
+    user
+where
+    rowid == 2;
+
+EXPLAIN QUERY PLAN
+SELECT
+    *
+FROM
+    user;

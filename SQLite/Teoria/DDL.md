@@ -1,6 +1,51 @@
 # Główne Komendy DDL (Data Definition Language) w SQL
 
-**DDL** (ang. *Data Definition Language*) to część języka SQL, która służy do definiowania i zarządzania strukturą bazy danych. DDL obejmuje komendy umożliwiające tworzenie, modyfikowanie i usuwanie obiektów w bazie danych, takich jak tabele, indeksy czy widoki.
+**DDL** (ang. *Data Definition Language*) to część języka SQL, która służy do definiowania i zarządzania strukturą bazy danych. DDL obejmuje komendy umożliwiające tworzenie, modyfikowanie i usuwanie obiektów w bazie danych,
+takich jak tabele, indeksy czy widoki.
+
+## Typy danych
+
+SQLite używa dynamicznego systemu typów danych, co oznacza, że typ danych wartości jest powiązany z samą wartością, a nie z kolumną, w której jest przechowywana. Oto główne typy danych w SQLite:
+
+### Klasy przechowywania
+
+1. **NULL**: Wartość NULL.
+2. **INTEGER**: Liczba całkowita ze znakiem, przechowywana w 1, 2, 3, 4, 6 lub 8 bajtach, w zależności od wielkości wartości. Zakres od `-9,223,372,036,854,775,808` do `9,223,372,036,854,775,807`.
+3. **REAL**: Liczba zmiennoprzecinkowa, przechowywana jako 8-bajtowa liczba zmiennoprzecinkowa IEEE.
+4. **TEXT**: Ciąg tekstowy, przechowywany przy użyciu kodowania bazy danych (UTF-8, UTF-16BE lub UTF-16LE).
+5. **BLOB**: Dane binarne, przechowywane dokładnie tak, jak zostały wprowadzone¹².
+
+### Typy powinowactwa
+
+SQLite używa również koncepcji typów powinowactwa, które są zalecanymi typami danych dla kolumn, ale nadal można przechowywać dowolny typ danych w dowolnej kolumnie. Główne typy powinowactwa to:
+
+1. **TEXT**: Przechowuje ciągi tekstowe.
+2. **NUMERIC**: Przechowuje wartości numeryczne, które mogą być liczbami całkowitymi lub zmiennoprzecinkowymi.
+3. **INTEGER**: Przechowuje liczby całkowite.
+4. **REAL**: Przechowuje liczby zmiennoprzecinkowe.
+5. **BLOB**: Przechowuje dane binarne¹.
+
+### Przykład
+
+Załóżmy, że chcesz utworzyć tabelę `example` z różnymi typami danych:
+
+```sql
+CREATE TABLE example (
+    id INTEGER PRIMARY KEY,
+    name TEXT,
+    age INTEGER,
+    salary REAL,
+    profile_picture BLOB
+);
+```
+
+W tej tabeli:
+
+- `id` jest liczbą całkowitą i kluczem głównym.
+- `name` jest ciągiem tekstowym.
+- `age` jest liczbą całkowitą.
+- `salary` jest liczbą zmiennoprzecinkową.
+- `profile_picture` przechowuje dane binarne, takie jak obraz.
 
 ## 1. CREATE
 
@@ -322,6 +367,58 @@ ALTER TABLE Customers
 RENAME TO Clients;
 ```
 
-## Podsumowanie
+### Podsumowanie
 
 Komendy DDL są kluczowe dla zarządzania strukturą bazy danych. Pozwalają na tworzenie nowych obiektów, modyfikowanie ich struktury oraz usuwanie, gdy są już niepotrzebne. Znajomość tych komend jest niezbędna do efektywnego projektowania i zarządzania bazami danych.
+
+## ROWID
+
+W SQLite, `rowid` jest specjalną kolumną, która automatycznie przypisywana jest każdemu wierszowi w tabeli, chyba że tabela została utworzona z opcją `WITHOUT ROWID`. Oto kilka kluczowych punktów dotyczących `rowid`:
+
+### Cechy `rowid`
+
+1. **Unikalność**: `rowid` jest unikalnym, nie-NULL, 64-bitowym liczbą całkowitą, która służy jako klucz dostępu do danych w wewnętrznym silniku przechowywania B-tree¹.
+2. **Dostępność**: `rowid` można odczytać lub zmienić, używając kolumn `rowid`, `oid` lub `_rowid_`, chyba że w tabeli zdefiniowano kolumny o tych nazwach¹.
+3. **Optymalizacja**: Dostęp do rekordów za pomocą `rowid` jest wysoce zoptymalizowany i bardzo szybki¹.
+
+### Przykład użycia `rowid`
+
+Załóżmy, że masz tabelę `students`:
+
+```sql
+CREATE TABLE students (
+    first_name TEXT,
+    last_name TEXT,
+    grade INTEGER
+);
+```
+
+Możesz uzyskać dostęp do `rowid` w tej tabeli w następujący sposób:
+
+```sql
+SELECT rowid, first_name, last_name, grade
+FROM students;
+```
+
+### Aliasowanie `rowid`
+
+Jeśli tabela ma kolumnę zdefiniowaną jako `INTEGER PRIMARY KEY`, ta kolumna staje się aliasem dla `rowid`. Na przykład:
+
+```sql
+CREATE TABLE students (
+    student_id INTEGER PRIMARY KEY,
+    first_name TEXT,
+    last_name TEXT,
+    grade INTEGER
+);
+```
+
+W tym przypadku `student_id` jest aliasem dla `rowid`, co oznacza, że wartości w kolumnie `student_id` są takie same jak wartości `rowid`.
+
+### Zastosowania `rowid`
+
+1. **Szybki dostęp do danych**: `rowid` umożliwia szybki dostęp do rekordów, co jest przydatne w operacjach wymagających wysokiej wydajności.
+2. **Unikalne identyfikatory**: `rowid` może służyć jako unikalny identyfikator dla każdego rekordu, co jest przydatne w wielu scenariuszach, takich jak synchronizacja danych.
+3. **Zarządzanie danymi**: Możliwość bezpośredniego odczytu i zapisu `rowid` pozwala na bardziej elastyczne zarządzanie danymi.
+
+[SQLite Documentation](https://sqlite.org/rowidtable.html)

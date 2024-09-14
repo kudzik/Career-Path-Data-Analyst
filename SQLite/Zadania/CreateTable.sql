@@ -65,3 +65,41 @@ VALUES
 DELETE FROM user_role
 where
     role_name == 'tester';
+
+--------
+DROP TABLE users;
+
+DROP TABLE user_role;
+
+CREATE TABLE
+    user_role (
+        id INT NOT NULL UNIQUE PRIMARY KEY,
+        role_name TEXT NOT NULL UNIQUE
+    );
+
+CREATE TABLE
+    users (
+        id INT NOT NULL UNIQUE PRIMARY KEY,
+        name TEXT NOT NULL,
+        email TEXT NOT NULL UNIQUE,
+        id_role INT NOT NULL,
+        FOREIGN KEY (id_role) REFERENCES user_role (id)
+    );
+
+-----
+CREATE TABLE
+    user_role (
+        id_role INTEGER NOT NULL UNIQUE,
+        role_name TEXT NOT NULL UNIQUE,
+        PRIMARY KEY (id_role AUTOINCREMENT)
+    );
+
+CREATE TABLE
+    users (
+        id_user INTEGER NOT NULL UNIQUE,
+        name TEXT NOT NULL,
+        email TEXT NOT NULL UNIQUE,
+        id_role INTEGER NOT NULL,
+        PRIMARY KEY (id_user AUTOINCREMENT),
+        FOREIGN KEY (id_role) REFERENCES user_role (id_role)
+    );

@@ -6,6 +6,14 @@
       "driver": "SQLite",
       "name": "SQLite",
       "database": "${workspaceFolder:Career-Path-Data-Analyst}/SQLite/DB/mydatabase.db"
+    },
+    {
+      "name": "BigQuery Connect",
+      "authenticator": "SERVICE_ACCOUNT",
+      "location": "us",
+      "previewLimit": 50,
+      "driver": "BigQuery",
+      "keyfile": "/Users/kudzik/Private/Google - BigQuery/linear-time-435809-k6-4c71badbe09f.json"
     }
   ]
 }

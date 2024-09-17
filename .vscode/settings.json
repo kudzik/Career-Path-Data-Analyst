@@ -8,7 +8,7 @@
       "database": "${workspaceFolder:Career-Path-Data-Analyst}/SQLite/DB/mydatabase.db"
     },
     {
-      "name": "BigQuery Connect",
+      "name": "BigQuery",
       "authenticator": "SERVICE_ACCOUNT",
       "location": "us",
       "previewLimit": 50,

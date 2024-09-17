@@ -1,0 +1,1 @@
+# Tworzenie tabeli w BigQuery

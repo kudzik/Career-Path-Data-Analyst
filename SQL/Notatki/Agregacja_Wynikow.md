@@ -219,9 +219,9 @@ COUNT([ALL | DISTINCT] wyrażenie)
 
 * `ALL` (domyślne): Zlicza wszystkie wiersze, w tym duplikaty i wartości NULL.
 * `DISTINCT`: Zlicza tylko unikalne (różne) wartości, ignorując duplikaty i wartości NULL.
-* `wyrażenie`: 
-    * `*`: Zlicza wszystkie wiersze w tabeli.
-    * Nazwa kolumny: Zlicza niepuste wartości w tej kolumnie.
+* `wyrażenie`:
+  * `*`: Zlicza wszystkie wiersze w tabeli.
+  * Nazwa kolumny: Zlicza niepuste wartości w tej kolumnie.
 
 **Przykłady:**
 
@@ -339,8 +339,6 @@ Zapytanie to zwróci tylko te działy, które mają więcej niż 5 pracowników.
 * Kolumny wymienione w klauzuli `SELECT` muszą być albo kolumnami grupującymi (z `GROUP BY`), albo używane wewnątrz funkcji agregujących.
 * Klauzula `HAVING` służy do filtrowania grup po agregacji, podczas gdy `WHERE` filtruje wiersze przed grupowaniem.
 * `GROUP BY` może znacznie uprościć zapytania i analizę danych.
-
-
 
 **HAVING - co to jest?**
 
@@ -475,7 +473,6 @@ HAVING COUNT(*) > 3 AND AVG(Pensja) > 4000; -- Filtrowanie po grupowaniu
 
 Ten przykład zwraca działy z Warszawy, które mają więcej niż 3 pracowników i średnią pensję powyżej 4000. Zauważ, że używamy zarówno `WHERE`, aby filtrować pracowników z Warszawy przed grupowaniem, jak i `HAVING`, aby filtrować działy po agregacji.
 
-
 **Funkcje rankingowe - co to są?**
 
 Funkcje rankingowe to specjalne funkcje, które pozwalają przypisać ranking, numer porządkowy lub percentyl do każdego wiersza w wyniku zapytania. Rankingi są obliczane na podstawie określonego porządku w ramach grupy (partycji) danych.
@@ -593,5 +590,3 @@ W tym przykładzie:
 
 * Aby w pełni wykorzystać korzyści z partycjonowania, zapytania powinny być formułowane w taki sposób, aby odwoływały się do kolumny partycjonującej (w naszym przykładzie `Stanowisko`).
 * Partycjonowanie może wprowadzić pewien narzut, więc warto je stosować tylko w przypadku dużych tabel, gdzie korzyści przewyższają koszty.
-
-

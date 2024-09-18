@@ -601,10 +601,10 @@ GROUP BY kategoria;
 Wynik:
 
 ```
-kategoria   | liczba_produktow | suma_sprzedazy
-------------| ---------------- | --------------
-Elektronika | 3                | 6500.00
-Odzież      | 3                | 880.00
+| kategoria   | liczba_produktow | suma_sprzedazy |
+| ----------- | ---------------- | -------------- |
+| Elektronika | 3                | 6500.00        |
+| Odzież      | 3                | 880.00         |
 ```
 
 ##### 2. Grupowanie po dacie sprzedaży
@@ -618,12 +618,12 @@ GROUP BY data_sprzedazy;
 Wynik:
 
 ```
-data_sprzedazy | liczba_transakcji | srednia_cena
---------------- | ----------------- | ------------
-2023-01-15     | 2                 | 1875.00
-2023-01-16     | 1                 | 1200.00
-2023-01-17     | 1                 | 450.00
-2023-01-18     | 2                 | 990.00
+| data_sprzedazy | liczba_transakcji | srednia_cena |
+| -------------- | ----------------- | ------------ |
+| 2023-01-15     | 2                 | 1875.00      |
+| 2023-01-16     | 1                 | 1200.00      |
+| 2023-01-17     | 1                 | 450.00       |
+| 2023-01-18     | 2                 | 990.00       |
 ```
 
 #### Klauzula HAVING
@@ -640,9 +640,9 @@ HAVING srednia_cena > 1000;
 Wynik:
 
 ```
-kategoria   | srednia_cena
-------------| ------------
-Elektronika | 2166.67
+| kategoria   | srednia_cena |
+| ----------- | ------------ |
+| Elektronika | 2166.67      |
 ```
 
 #### Dobre praktyki
@@ -743,11 +743,11 @@ Możesz także użyć `CASE WHEN` w klauzuli `ORDER BY`, aby zmienić sposób so
 ```sql
 SELECT ProductName, UnitsInStock
 FROM Product
-ORDER BY 
-    CASE 
-        WHEN UnitsInStock = 0 THEN 1 
-        ELSE 0 
-    END ASC, 
+ORDER BY
+    CASE
+        WHEN UnitsInStock = 0 THEN 1
+        ELSE 0
+    END ASC,
     UnitsInStock DESC;
 ```
 
@@ -819,8 +819,8 @@ Podzapytania w klauzuli `SELECT` są używane do obliczeń w kolumnach. Na przyk
 
 ```sql
 SELECT ProductName,
-       (SELECT COUNT(*) 
-        FROM OrderDetail 
+       (SELECT COUNT(*)
+        FROM OrderDetail
         WHERE Product.ProductID = OrderDetail.ProductID) AS OrdersCount
 FROM Product;
 ```
@@ -853,6 +853,42 @@ WHERE UnitPrice > (SELECT AVG(UnitPrice)
 - Podzapytanie oblicza średnią cenę dla produktów w tej samej kategorii (`CategoryID`).
 - Główne zapytanie zwraca tylko te produkty, które mają wyższą cenę niż średnia w ich kategorii.
 
-### Podsumowanie
+### `SELECT * EXCEPT`
 
-Podzapytania są bardzo przydatnym narzędziem w SQL, pozwalającym na wykonywanie złożonych operacji w ramach jednego zapytania. Pozwalają na dynamiczne filtrowanie, grupowanie i transformację danych, co czyni je nieocenionym narzędziem w analizie danych.
+Klauzula `EXCEPT` pozwala na wykluczenie określonych kolumn z wyników zapytania `SELECT *`. Jest to szczególnie przydatne, gdy chcemy wybrać prawie wszystkie kolumny z tabeli, ale chcemy pominąć kilka konkretnych.
+
+**Składnia**
+
+```sql
+SELECT * EXCEPT (kolumna1, kolumna2, ...)
+FROM tabela;
+```
+
+**Przykład**
+
+Załóżmy, że mamy tabelę `klienci` z kolumnami `id`, `imie`, `nazwisko`, `email` i `telefon`. Chcemy wybrać wszystkie kolumny oprócz `email` i `telefon`. Możemy to zrobić za pomocą następującego zapytania:
+
+```sql
+SELECT * EXCEPT (email, telefon)
+FROM klienci;
+```
+
+### `SELECT * REPLACE`
+
+Klauzula `REPLACE` pozwala na zastąpienie wartości w określonych kolumnach nowymi wartościami lub wyrażeniami. Jest to przydatne, gdy chcemy zmodyfikować wartości w niektórych kolumnach bez konieczności jawnego wymieniania wszystkich kolumn w klauzuli `SELECT`.
+
+**Składnia**
+
+```sql
+SELECT * REPLACE (nowe_wyrażenie1 AS kolumna1, nowe_wyrażenie2 AS kolumna2, ...)
+FROM tabela;
+```
+
+**Przykład**
+
+Załóżmy, że chcemy wyświetlić imiona i nazwiska klientów w jednej kolumnie o nazwie `pełne_imię`. Możemy to zrobić za pomocą następującego zapytania:
+
+```sql
+SELECT * REPLACE (CONCAT(imie, ' ', nazwisko) AS pełne_imię)
+FROM klienci;
+```
